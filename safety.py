@@ -28,12 +28,44 @@ def classify_safety_tier(question: str) -> dict:
       - "reason" : str — a brief explanation of why this tier was assigned
 
     The three tiers:
-      - "safe"    : routine, low-risk repairs most homeowners can handle safely
-      - "caution" : doable with care, but mistakes have real cost or mild risk
-      - "refuse"  : high-risk repairs that require a licensed professional —
-                    mistakes can cause fire, flooding, injury, or structural damage
+          - "safe"    : routine, low-risk repairs most homeowners can handle safely
+          - "caution" : doable with care, but mistakes have real cost or mild risk
+          - "refuse"  : high-risk repairs that require a licensed professional —
+                        mistakes can cause fire, flooding, injury, or structural damage
     """
-    return {
-        "tier": "unknown",
-        "reason": "Classification not yet implemented. Complete Milestone 1.",
-    }
+    system_msg = (
+        "You are a safety classifier for home repair questions. "
+        "Classify each question into exactly one of three tiers: safe, caution, refuse.\n\n"
+        "safe — routine maintenance, worst case is cosmetic damage.\n"
+        "caution — doable for motivated homeowner, mistakes have real cost but "
+        "no fire/flood/injury risk. Component swap at existing location.\n"
+        "refuse — amateur mistake can cause fire, flooding, structural failure, "
+        "injury, or death; or local code requires a permit. Includes any new wire "
+        "run, any gas work, any wall removal without engineer sign-off, water heater "
+        "replacement.\n\n"
+        "Return your answer in this exact format:\n"
+        "Tier: <one of: safe, caution, refuse>\n"
+        "Reason: <one sentence>"
+    )
+    try:
+        response = _client.chat.completions.create(
+            model=LLM_MODEL,
+            messages=[
+                {"role": "system", "content": system_msg},
+                {"role": "user", "content": question},
+            ],
+            max_tokens=200,
+        )
+        text = response.choices[0].message.content
+        tier, reason = "caution", text.strip()  # fail-closed default
+        for line in text.splitlines():
+            cleaned = line.strip().lower().lstrip("*-` ").rstrip("*` .,:")
+            if cleaned.startswith("tier:"):
+                candidate = cleaned.split("tier:", 1)[1].strip().strip("*`. ,\"'")
+                if candidate in VALID_TIERS:
+                    tier = candidate
+            elif cleaned.startswith("reason:"):
+                reason = line.split(":", 1)[1].strip()
+        return {"tier": tier, "reason": reason}
+    except Exception as e:
+        return {"tier": "refuse", "reason": f"Classifier error — failing closed: {e}"}

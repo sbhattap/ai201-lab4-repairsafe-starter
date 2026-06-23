@@ -40,17 +40,18 @@ Determine whether a home repair question is safe to answer directly, requires a 
 
 **safe:**
 ```
-[your definition here]
+["safe"    : routine, low-risk repairs most homeowners can handle safely]
 ```
 
 **caution:**
 ```
-[your definition here]
+["caution" : doable with care, but mistakes have real cost or mild risk]
 ```
 
 **refuse:**
 ```
-[your definition here]
+["refuse"  : high-risk repairs that require a licensed professional —
+                    mistakes can cause fire, flooding, injury, or structural damage]
 ```
 
 ---
@@ -62,7 +63,7 @@ Determine whether a home repair question is safe to answer directly, requires a 
 *Consider: what happens when a question is genuinely ambiguous — e.g., "can I replace my own outlets?" Which tier should that land in, and how does your approach handle questions at the boundary?*
 
 ```
-[your answer here]
+[I will ask  the llm to provide an one line reasoning before naming the tier.]
 ```
 
 ---
@@ -74,7 +75,7 @@ Determine whether a home repair question is safe to answer directly, requires a 
 *The format you used in Lab 3 (`Label: X / Reasoning: Y`) is a reasonable starting point, but you're not required to use it. Whatever you choose, you'll need to parse it in code — so consider how much variation the LLM might introduce and how you'll handle that.*
 
 ```
-[your answer here]
+[I will ask the llm to output the tier and reason in a JSON format, with keys "tier" and "reason".]
 ```
 
 ---
@@ -85,12 +86,24 @@ Determine whether a home repair question is safe to answer directly, requires a 
 
 **System message:**
 ```
-[your prompt here]
+["You are a safety classifier for home repair questions. "
+        "Classify each question into exactly one of three tiers: safe, caution, refuse.\n\n"
+        "safe — routine maintenance, worst case is cosmetic damage.\n"
+        "caution — doable for motivated homeowner, mistakes have real cost but "
+        "no fire/flood/injury risk. Component swap at existing location.\n"
+        "refuse — amateur mistake can cause fire, flooding, structural failure, "
+        "injury, or death; or local code requires a permit. Includes any new wire "
+        "run, any gas work, any wall removal without engineer sign-off, water heater "
+        "replacement.\n\n"
+        "Return your answer in this exact format:\n"
+        "Tier: <one of: safe, caution, refuse>\n"
+        "Reason: <one sentence>"]
 ```
 
 **User message:**
 ```
-[your prompt here]
+["Classify the following home repair question:\n\n"
+        "<question>"]
 ```
 
 ---
@@ -100,7 +113,7 @@ Determine whether a home repair question is safe to answer directly, requires a 
 *The most consequential classification decision is whether a question lands in "caution" or "refuse." Write down your rule for this boundary — one sentence. Then give two examples of questions that sit close to the line and explain which side they fall on and why.*
 
 ```
-[your rule and examples here]
+[The boundary between "caution" and "refuse" is determined by whether a mistake could lead to significant safety hazards (fire, flooding, injury) or requires professional certification or permits.]
 ```
 
 ---
@@ -112,7 +125,7 @@ Determine whether a home repair question is safe to answer directly, requires a 
 *Note: failing open (returning "safe" as a fallback) is more dangerous than failing closed (returning "caution"). Which makes more sense here, and why?*
 
 ```
-[your answer here]
+[If the LLM response can't be parsed or the tier validation fails, the function will return a default tier of "caution" with a reason indicating that the classification could not be determined. Failing closed (returning "caution") is safer than failing open (returning "safe") because it errs on the side of caution, reducing the risk of providing unsafe advice.]
 ```
 
 ---
@@ -124,11 +137,11 @@ Determine whether a home repair question is safe to answer directly, requires a 
 **One classification that surprised you — question, tier you expected, tier it returned, and why:**
 
 ```
-[your answer here]
+[N/A]
 ```
 
 **One prompt change you made after seeing the first few outputs, and what it fixed:**
 
 ```
-[your answer here]
+[N/A]
 ```
