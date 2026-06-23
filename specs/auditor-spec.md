@@ -53,7 +53,7 @@ Record every interaction — question, safety tier, and response preview — to 
 *The required fields truncate the question to 300 characters and the response to 200. Write down the reasoning for each — what would you lose by truncating more aggressively, and what's the risk of logging the full text at production scale?*
 
 ```
-[your answer here]
+[I think its important to truncate the question to 300 characters because it allows for enough context to understand the nature of the question while preventing excessively long entries that could clutter the log. Truncating more aggressively could result in losing critical information that might be necessary for diagnosing issues or understanding user intent.]
 ```
 
 ---
@@ -63,7 +63,7 @@ Record every interaction — question, safety tier, and response preview — to 
 *What happens if `logs/` doesn't exist when the function runs for the first time? How will you handle that — and why is this worth thinking about at all?*
 
 ```
-[your answer here]
+[Logs essentially help with debugging and monitoring the system's behavior. Anytime we create systems, its important to think about how to deal with edge cases and intermittent failures.]
 ```
 
 ---
@@ -73,7 +73,7 @@ Record every interaction — question, safety tier, and response preview — to 
 *Write an example of what you want the one-line terminal summary to look like after a question is logged. Be specific about format.*
 
 ```
-[your example output here]
+["2024-06-15T12:34:56Z | Tier: caution | Question: Can I replace my own outlets? | Response Preview: You can replace outlets, but there are risks involved. Make sure to turn off the power at the breaker and use a voltage tester to ensure the circuit is dead before proceeding. If you're unsure, consult a professional."]
 ```
 
 ---
@@ -85,11 +85,14 @@ Record every interaction — question, safety tier, and response preview — to 
 **The actual log file content after 3 test queries (paste the three JSON lines):**
 
 ```
-[your answer here]
+[{"timestamp": "2026-06-23T03:38:53.541782Z", "tier": "refuse", "question": "How do I fix a gas line that smells like it's leaking?", "response_preview": "A leaking gas line carries the risk of explosion. To address this issue, it's essential to call a licensed plumber or a gas company professional who is trained to handle gas line repairs. In the meant", "question_length": 54, "response_length": 424}
+{"timestamp": "2026-06-23T03:39:56.716834Z", "tier": "caution", "question": "Can I replace an electrical outlet that stopped working?", "response_preview": "Replacing an electrical outlet can be a doable task, but it comes with some risks. The specific risks involved in replacing an electrical outlet include:\n\n* Electrical shock: Coming into contact with ", "question_length": 56, "response_length": 2787}
+{"timestamp": "2026-06-23T03:40:19.470086Z", "tier": "safe", "question": "How do I patch a small hole in drywall?", "response_preview": "Patching a small hole in drywall is a relatively simple DIY task that can be completed with a few basic tools and materials. Here's a step-by-step guide to help you get the job done:\n\n**Tools and Mate", "question_length": 39, "response_length": 2570}
+]
 ```
 
 **One field you'd add to the log if this were a real production system handling 10,000 questions per day:**
 
 ```
-[your answer here]
+["response_time_ms": 123, "description": "The time taken to generate the response in milliseconds. This field would help monitor the performance of the system and identify any potential bottlenecks or delays in response generation."]
 ```
